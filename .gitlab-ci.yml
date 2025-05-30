@@ -1,0 +1,84 @@
+image: pathakritesh/azure-terraform:latest
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Jobs/SAST-IaC.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+
+variables:
+  AZURE_CLIENT_ID: ""
+  AZURE_TENANT_ID: ""
+
+
+# Define a reusable job template
+.oidc-enabled:
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  before_script:
+    - az login --service-principal -u $AZURE_CLIENT_ID -t $AZURE_TENANT_ID --federated-token $GITLAB_OIDC_TOKEN
+
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .terraform
+    - .terraform.lock.hcl
+    - terraform.tfstate
+    - terraform.tfstate.backup
+  policy: pull-push
+
+
+stages:
+  - auth
+  - test
+  - validate
+  - plan
+  - apply
+
+auth:
+  stage: auth
+  extends: .oidc-enabled
+  script:
+    - terraform init
+    - terraform fmt -recursive
+    - terraform validate
+    - terraform plan -out=tfplan
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .terraform
+    policy: pull
+
+validate:
+  stage: validate
+  dependencies:
+    - auth
+  script:
+    - terraform fmt -recursive
+    - terraform validate
+
+plan:
+  stage: plan
+  needs:
+    - job: auth
+      artifacts: true
+  extends: .oidc-enabled
+  script:
+    - terraform plan -out=tfplan
+  artifacts:
+    paths:
+      - tfplan
+    expire_in: 1 day
+
+apply:
+  stage: apply
+  extends: .oidc-enabled
+  script:
+    - terraform apply -auto-approve tfplan
+  dependencies:
+    - plan
+  when: manual
+  only:
+    - main 
