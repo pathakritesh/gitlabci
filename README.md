@@ -70,4 +70,9 @@ This project contains Terraform configurations to create and manage Azure Virtua
 2. Make your changes
 3. Create a merge request
 4. Wait for pipeline approval
-5. Merge after approval 
+5. Merge after approval
+
+## Azure OpenID Connect configuration on Console 
+- Microsoft Entra ID > App registrations > New registration> Follow the screenshot 
+![image](https://github.com/user-attachments/assets/83c852bf-0665-4999-a3b9-a75f847ee480)
+
