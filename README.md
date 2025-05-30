@@ -3,7 +3,7 @@
 This project contains Terraform configurations to create and manage Azure Virtual Networks with a production-ready GitLab CI/CD pipeline.
 
 ## Prerequisites
-
+- Configure OpenID Connect in Azure to retrieve temporary credentials URL:https://docs.gitlab.com/ci/cloud_services/azure/
 - Azure subscription
 - GitLab account
 - Terraform CLI (for local development)
