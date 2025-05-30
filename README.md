@@ -33,8 +33,6 @@ This project contains Terraform configurations to create and manage Azure Virtua
 1. Clone the repository
 2. Configure Azure credentials in GitLab CI/CD variables:
    - `ARM_CLIENT_ID`
-   - `ARM_CLIENT_SECRET`
-   - `ARM_SUBSCRIPTION_ID`
    - `ARM_TENANT_ID`
 
 3. Update the variables in your environment or create a `terraform.tfvars` file
